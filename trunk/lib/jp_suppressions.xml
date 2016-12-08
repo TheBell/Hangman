@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<!-- Checkstyle suppressions for student-based code. -->
+<!-- $Id: jp_suppressions.xml 395 2016-11-09 23:09:16Z jody $ -->
+
+<suppressions>
+    <!-- Tone down the checking for test code -->
+    <suppress checks="MagicNumber" files="[\\/]*Test.java$"/>
+    <suppress checks="EmptyBlock" files="[\\/]*Test.java$"/>
+    <suppress checks="ImportControl" files="[\\/]*Test.java$"/>
+    <suppress checks="Javadoc" files="[\\/]*Test.java$"/>
+    <suppress checks="MethodCount" files="[\\/]*Test.java$"/>
+    <suppress checks="EqualsAvoidNull" files="[\\/]*Test.java$"/>
+    <suppress checks="DesignForExtension" files="[\\/]*Test.java$"/>
+    <suppress checks="LineLength" files="[\\/]*Test.java$"/>
+    <suppress checks="Name" files="[\\/]*Test.java$"/>
+</suppressions>
