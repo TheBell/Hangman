@@ -1,9 +1,9 @@
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
  */
 public class Hangman implements HangmanManager {
 
-    /** The words of given length from the dictionary. */
+    /** The words of given length from the dictionary that fit the pattern. */
     private Set<String> words;
 
     /** The number of incorrect-guess left. */
@@ -36,15 +36,6 @@ public class Hangman implements HangmanManager {
 
     /** The pattern to display. */
     private StringBuilder pattern;
-
-    /** The answer chosen from the set of possible words. */
-    private String answer;
-
-    /**
-     * A set containing only the answer. Returned to HangmanConsole and
-     * HangmanConsole so they display the correct answer.
-     */
-    private Set<String> answerSet;
 
     /**
      * Sets up a hangman game. It chooses a word from the list given with a
@@ -62,13 +53,10 @@ public class Hangman implements HangmanManager {
      */
     Hangman(final List<String> dictionary, final int length, final int max)
             throws IllegalArgumentException {
-        loadDictionaryAndFindWordsOfDesiredLength(dictionary, length);
         setInitialPattern(length);
+        loadDictionaryAndFindWordsOfDesiredLength(dictionary, length);
         guessesLeft = max;
         guesses = new TreeSet<>();
-        if (words.size() >= 1) {
-            chooseAnswer();
-        }
     }
 
     /**
@@ -89,7 +77,7 @@ public class Hangman implements HangmanManager {
             throw new IllegalArgumentException(
                     "Cannot have length less than 1");
         }
-        words = new TreeSet<String>();
+        words = new TreeSet<>();
         words.addAll(dictionary.stream().filter(s -> s.length() == length)
                 .collect(Collectors.toSet()));
     }
@@ -107,33 +95,12 @@ public class Hangman implements HangmanManager {
     }
 
     /**
-     * Chooses the answer from the word-list randomly. Reduces the effective
-     * word list to just that one answer.
-     */
-    private void chooseAnswer() {
-        assert words.size() > 0;
-
-        Random rand = new Random();
-        int randInt = rand.nextInt(words.size());
-        Iterator<String> it = words.iterator();
-        for (int i = 0; i <= randInt; i++) {
-            answer = it.next();
-        }
-
-        answerSet = new TreeSet<>();
-        answerSet.add(answer);
-    }
-
-    /**
-     * Returns a set containing only the answer.
+     * Returns all words of the set length that match the pattern.
      *
      * @see HangmanManager#words()
      */
     @Override
     public Set<String> words() {
-        if (answer != null) {
-            return new TreeSet<>(answerSet);
-        }
         return new TreeSet<>(words);
     }
 
@@ -171,29 +138,85 @@ public class Hangman implements HangmanManager {
     @Override
     public int record(final char guess) throws IllegalArgumentException {
         assert ('a' <= guess) && (guess <= 'z'); // Guess is lower-case letter.
-        if (guessesLeft() < 1 || answer == null) {
-            throw new IllegalStateException("No guesses left");
-        }
+
         if (guesses.contains(guess)) {
             throw new IllegalArgumentException(
                     guess + " has already been guessed");
         }
         guesses.add(guess);
-        int totalFound = 0;
 
-        if (answer.indexOf(guess) >= 0) {
-            for (int i = 0; i < answer.length(); i++) {
-                if (answer.charAt(i) == guess) {
-                    totalFound++;
-                    // This pattern maps the series 0,1,2,3 to 0,2,4,6 because
-                    // of the spaces in the pattern
-                    pattern.setCharAt((i * 2), guess);
-                }
-            }
-        } else {
+        words = findLargestSet(guess);
+
+        // Find number of changes made.
+        String firstWord = words.iterator().next();
+
+        if (firstWord.indexOf(guess) == -1) {
             guessesLeft--;
+            return 0;
         }
-        return totalFound;
+
+        return (int) firstWord.chars().filter(c -> c == guess).count();
     }
 
+    /**
+     * Finds the largest set of words based on the last guess and sets the new
+     * pattern.
+     *
+     * @param guess
+     *            the letter guessed
+     * @return the largest set of words
+     */
+    private Set<String> findLargestSet(final char guess) {
+        // Maps patterns to sets of words
+        TreeMap<String, Set<String>> allWords = new TreeMap<>();
+        String wordPattern;
+
+        // Set up map
+        for (String word : words) {
+            wordPattern = findNewPattern(word, guess);
+            if (allWords.containsKey(wordPattern)) {
+                allWords.get(wordPattern).add(word);
+            } else {
+                TreeSet<String> newSet = new TreeSet<>();
+                newSet.add(word);
+                allWords.put(wordPattern, newSet);
+            }
+        }
+        // Find largest map entry
+        Set<String> largestSet = new TreeSet<>();
+        String largestSetPattern = "";
+        for (Map.Entry<String, Set<String>> entry : allWords.entrySet()) {
+            if (entry.getValue().size() > largestSet.size()) {
+                largestSet = entry.getValue();
+                largestSetPattern = entry.getKey();
+            }
+        }
+        pattern = new StringBuilder(largestSetPattern);
+        return largestSet;
+    }
+
+    /**
+     * Finds the pattern that would be associated with a word after the guess.
+     *
+     * @param word
+     *            the word to find a new pattern for
+     * @param guess
+     *
+     *            the last guess
+     * @return the pattern for this word
+     */
+    private String findNewPattern(final String word, final char guess) {
+        StringBuilder newPattern = new StringBuilder(pattern);
+
+        if (word.indexOf(guess) != -1) {
+            for (int i = 0; i < word.length(); i++) {
+                if (word.charAt(i) == guess) {
+
+                    // 2 * i maps 0,1,2,3... to 0,2,4,6...
+                    newPattern.setCharAt(2 * i, guess);
+                }
+            }
+        }
+        return newPattern.toString();
+    }
 }

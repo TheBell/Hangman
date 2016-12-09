@@ -1,16 +1,19 @@
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
-import javax.swing.JOptionPane;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Scanner;
+
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
+
 /**
- * Class HangmanGUI includes a static main method that
- * reads a dictionary of words to be used during the game,
- * then plays a game with the user via the console.
+ * Class HangmanGUI includes a static main method that reads a dictionary of
+ * words to be used during the game, then plays a game with the user via the
+ * console.
+ *
  * @author Dr. Jody Paul
  * @version 1.1
  */
@@ -33,12 +36,16 @@ public final class HangmanGUI {
     /**
      * Ensure no visible constructor for this utility class.
      */
-    private HangmanGUI() { }
+    private HangmanGUI() {
+    }
 
     /**
      * Driver to run the hangman game.
-     * @param args ignored
-     * @throws FileNotFoundException if dictionary file not available
+     *
+     * @param args
+     *            ignored
+     * @throws FileNotFoundException
+     *             if dictionary file not available
      */
     public static void main(final String[] args) throws FileNotFoundException {
         int length = WORD_LENGTH; // The number of characters in guessed word.
@@ -55,9 +62,9 @@ public final class HangmanGUI {
         while (input.hasNext()) {
             dictionary.add(input.next().toLowerCase());
         }
-        length = Integer.parseInt(askUser(
-                        "Welcome to the Hangman word-guessing game.\n\n"
-                      + "What length word do you want to use?"));
+        length = Integer.parseInt(
+                askUser("Welcome to the Hangman word-guessing game.\n\n"
+                        + "What length word do you want to use?"));
 
         max = Integer.parseInt(askUser("How many wrong answers allowed?"));
 
@@ -79,7 +86,9 @@ public final class HangmanGUI {
 
     /**
      * Plays one game with the user.
-     * @param hanager the hangman manager
+     *
+     * @param hanager
+     *            the hangman manager
      */
     private static void playGame(final HangmanManager hanager) {
         String prompt = "";
@@ -115,54 +124,50 @@ public final class HangmanGUI {
 
     /**
      * Prompt the user to enter a response.
-     * @param prompt the prompt to provide to the user
+     *
+     * @param prompt
+     *            the prompt to provide to the user
      * @return string entered by user
      */
     private static String askUser(final String prompt) {
-        String response = (String) JOptionPane.showInputDialog(
-                                                   null,
-                                                   prompt,
-                                                   "Hangman Game",
-                                                   JOptionPane.QUESTION_MESSAGE,
-                                                   icon,
-                                                   null,
-                                                   null
-                                                  );
-        if (null == response) { System.exit(-1); }
+        String response = (String) JOptionPane.showInputDialog(null, prompt,
+                "Hangman Game", JOptionPane.QUESTION_MESSAGE, icon, null, null);
+        if (null == response) {
+            System.exit(-1);
+        }
         return response;
     }
 
     /**
      * Prompt the user to respond with YES or NO.
-     * @param prompt the prompt to provide to the user
+     *
+     * @param prompt
+     *            the prompt to provide to the user
      * @return true if user selects YES, false otherwise
      */
     private static boolean confirmUser(final String prompt) {
-        return (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(
-                                            null,
-                                            prompt,
-                                            "Hangman Game",
-                                            JOptionPane.YES_NO_OPTION,
-                                            JOptionPane.QUESTION_MESSAGE,
-                                            icon));
+        return (JOptionPane.YES_OPTION == JOptionPane.showConfirmDialog(null,
+                prompt, "Hangman Game", JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE, icon));
     }
 
     /**
      * Provide information to the user.
-     * @param info the information to provide to the user
+     *
+     * @param info
+     *            the information to provide to the user
      */
     private static void tellUser(final String info) {
-        JOptionPane.showMessageDialog(null,
-                                      info,
-                                      "Hangman Message",
-                                      JOptionPane.INFORMATION_MESSAGE,
-                                      icon);
+        JOptionPane.showMessageDialog(null, info, "Hangman Message",
+                JOptionPane.INFORMATION_MESSAGE, icon);
     }
 
     /**
-     * Report the results of the game,
-     * including showing the answer if appropriate.
-     * @param hanager the hangman play manager
+     * Report the results of the game, including showing the answer if
+     * appropriate.
+     *
+     * @param hanager
+     *            the hangman play manager
      */
     private static void showResults(final HangmanManager hanager) {
         // Retrieve and display goal (the first word in the list).

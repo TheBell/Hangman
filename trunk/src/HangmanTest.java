@@ -77,6 +77,7 @@ public class HangmanTest {
         assertEquals("- - - - -", testGame.pattern());
 
         testGame.record('r');
+        System.out.println(testGame.words());
         assertEquals("- - r r -", testGame.pattern());
     }
 
